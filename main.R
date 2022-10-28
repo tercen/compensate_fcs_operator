@@ -49,7 +49,7 @@ out <- sapply(
 
 rmap <- ctx$rselect() %>% mutate(.ri = seq_len(nrow(.)) - 1L)
 ri_vec <- rmap$.ri
-names(ri_vec) <- rmap$gs0.variable
+names(ri_vec) <- rmap[[1]]
 
 df_tmp <- lapply(out, function(x) as_tibble(exprs(x))) %>% bind_rows()
 
