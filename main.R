@@ -29,15 +29,16 @@ fset <- fset %>%
   group_map(~tim::matrix_to_flowFrame(as.matrix(.x)))
 
 # get comp
-schema <- find_schema_by_factor_name(ctx, ctx$labels[[1]])
-table <- ctx$client$tableSchemaService$select(
-  schema$id,
-  Map(function(x) x$name, schema$columns),
-  offset = 0,
-  limit = schema$nRows
-)
+doc.id <- ctx$select(ctx$labels[[1]], nr = 1)[[1]]
+table <- ctx$client$tableSchemaService$select(doc.id) %>%
+  as_tibble()
 
-spill.matrices = lapply(as_tibble(table)[[".base64.serialized.r.model"]], deserialize_from_string)
+spill.matrices = table %>% 
+  group_by(across(contains("filename"))) %>%
+  group_map(~{
+    tmp <- tidyr::pivot_wider(.x, id_cols = "channel_1",names_from = "channel_2", values_from = "value")
+    tmp %>% select(-channel_1) %>% as.matrix()
+  })
 
 out <- sapply(
   seq_len(length(fset)),
