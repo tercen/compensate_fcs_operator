@@ -33,6 +33,10 @@ doc.id <- ctx$select(ctx$labels[[1]], nr = 1)[[1]]
 table <- ctx$client$tableSchemaService$select(doc.id) %>%
   as_tibble()
 
+# "New data set" upload case
+table$channel_1 <- gsub("__remove_ns__.", "", table$channel_1)
+table$channel_2 <- gsub("__remove_ns__.", "", table$channel_2)
+
 spill.matrices = table %>% 
   group_by(across(contains("filename"))) %>%
   group_map(~{
