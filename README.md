@@ -6,16 +6,20 @@
 
 ##### Usage
 
-Input projection|.
+Multi data step - Left|.
 ---|---
-`row`      | Variable, channel
-`column`   | Observation, cells
+`row`      | Channel
+`column`   | Event ID + filename
 `y`        | Measurement
-`labels`   | "compensation_matrices" factor output during FCS import
+
+Multi data step - Right|.
+---|---
+`row`      | "comp_1" factor as output by FCS importer
+`column`   | "comp_2" factor as output by FCS importer + Filename
+`y`        | Compensation value
 
 Output relations|.
 ---|---
-`filename`          | character, the name of the FCS file
 `compensated`          | numeric, compensated values, per channel and observation
 
 ##### Details
