@@ -10,6 +10,15 @@ source("./utils.R")
 
 ctx <- tercenCtx()
 
+if(is.null(ctx$task)) {
+  stop("task is null")
+  # ctx2 = tercenCtx(workflowId = "ba3163d67612e4be851fad4561f13eeb", stepId = "13ed857e-8524-4972-b2e9-4456cd9d18c5")
+} else {
+  pair <- Find(function(pair) identical(pair$key, "task.siblings.id"), ctx$task$environment)
+  task_siblings_id <- jsonlite::fromJSON(pair$value)
+  ctx2 <- tercenCtx(taskId = task_siblings_id)
+}
+
 data <- ctx$as.matrix() %>% t()
 colnames(data) <- ctx$rselect()[[1]]
 
@@ -33,9 +42,16 @@ doc.id <- ctx$select(ctx$labels[[1]], nr = 1)[[1]]
 table <- ctx$client$tableSchemaService$select(doc.id) %>%
   as_tibble()
 
-# "New data set" upload case
-table$channel_1 <- gsub("__remove_ns__.", "", table$channel_1)
-table$channel_2 <- gsub("__remove_ns__.", "", table$channel_2)
+
+df_comp <- ctx2 %>% select(.ci, .ri, .y)
+df_col <- ctx2$cselect() %>%
+  mutate(.ci = seq_len(nrow(.)) - 1L)
+df_row <- ctx2$rselect() %>%
+  mutate(.ri = seq_len(nrow(.)) - 1L)
+table <- df_comp %>%
+  left_join(df_col, by = ".ci") %>%
+  left_join(df_row, by = ".ri") %>%
+  rename(channel_1 = comp_1, channel_2 = comp_2, value = .y)
 
 spill.matrices = table %>% 
   group_by(across(contains("filename"))) %>%
