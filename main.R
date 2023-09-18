@@ -37,12 +37,7 @@ fset <- fset %>%
   group_by(across(contains("filename"))) %>%
   group_map(~tim::matrix_to_flowFrame(as.matrix(.x)))
 
-# get comp
-doc.id <- ctx$select(ctx$labels[[1]], nr = 1)[[1]]
-table <- ctx$client$tableSchemaService$select(doc.id) %>%
-  as_tibble()
-
-
+# Get compensation matrices
 df_comp <- ctx2 %>% select(.ci, .ri, .y)
 df_col <- ctx2$cselect() %>%
   mutate(.ci = seq_len(nrow(.)) - 1L)
