@@ -6,13 +6,10 @@ suppressPackageStartupMessages({
   library(base64enc)
 })
 
-source("./utils.R")
-
 ctx <- tercenCtx()
 
 if(is.null(ctx$task)) {
-  stop("task is null")
-  # ctx2 = tercenCtx(workflowId = "ba3163d67612e4be851fad4561f13eeb", stepId = "13ed857e-8524-4972-b2e9-4456cd9d18c5")
+  stop("Task is null.")
 } else {
   pair <- Find(function(pair) identical(pair$key, "task.siblings.id"), ctx$task$environment)
   task_siblings_id <- jsonlite::fromJSON(pair$value)
