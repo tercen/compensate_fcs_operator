@@ -35,8 +35,7 @@ fset <- fset %>%
   group_map(~tim::matrix_to_flowFrame(as.matrix(.x)))
 
 # Get compensation matrices
-df_comp <- ctx2 %>% select(.ci, .ri, .y) %>%
-  # group_by(.ci, .ri) %>% summarise(.y = mean(.y))
+df_comp <- ctx2 %>% select(.ci, .ri, .y)
 df_col <- ctx2$cselect() %>%
   mutate(.ci = seq_len(nrow(.)) - 1L)
 df_row <- ctx2$rselect() %>%
@@ -55,7 +54,6 @@ if(!identical(sort(unique(table$channel_1)), sort(unique(table$channel_2)))) {
   stop("Channel names must be identical in rows and columns of the compensation matrix.")
 }
 ## Check compensation channel names vs. data channels
-
 n_chan <- length(unique(table$channel_1)[which(unique(table$channel_1) %in% colnames(data))])
 if(n_chan == 0) {
   stop("No compensation matrix channel found in the raw data.")
