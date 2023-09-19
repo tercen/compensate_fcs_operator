@@ -35,7 +35,8 @@ fset <- fset %>%
   group_map(~tim::matrix_to_flowFrame(as.matrix(.x)))
 
 # Get compensation matrices
-df_comp <- ctx2 %>% select(.ci, .ri, .y)
+df_comp <- ctx2 %>% select(.ci, .ri, .y) %>%
+  # group_by(.ci, .ri) %>% summarise(.y = mean(.y))
 df_col <- ctx2$cselect() %>%
   mutate(.ci = seq_len(nrow(.)) - 1L)
 df_row <- ctx2$rselect() %>%
@@ -45,6 +46,23 @@ table <- df_comp %>%
   left_join(df_row, by = ".ri") %>%
   rename(channel_1 = comp_1, channel_2 = comp_2, value = .y)
 
+## Check unique compensation values
+if(any(table(df_comp$.ci, df_comp$.ri) > 1)) {
+  stop("Multiple compensation values found in at least one cell.")
+}
+## Check compensation channel names
+if(!identical(sort(unique(table$channel_1)), sort(unique(table$channel_2)))) {
+  stop("Channel names must be identical in rows and columns of the compensation matrix.")
+}
+## Check compensation channel names vs. data channels
+
+n_chan <- length(unique(table$channel_1)[which(unique(table$channel_1) %in% colnames(data))])
+if(n_chan == 0) {
+  stop("No compensation matrix channel found in the raw data.")
+} else {
+  ctx$log(paste0("Performing compensation on ", n_chan, " channels")) 
+}
+
 spill.matrices = table %>% 
   group_by(across(contains("filename"))) %>%
   group_map(~{
@@ -52,11 +70,18 @@ spill.matrices = table %>%
     tmp %>% select(-channel_1) %>% as.matrix()
   })
 
+n_spill <- length(spill.matrices)
+
 out <- sapply(
   seq_len(length(fset)),
-  function(x) {
-    cond <- colnames(spill.matrices[[x]]) %in% colnames(fset[[x]])
-    compensate(fset[[x]], spill.matrices[[x]][cond, cond])
+  function(fs_id) {
+    if(n_spill == 1) {
+      sp <- spill.matrices[[1]]
+    } else {
+      sp <- spill.matrices[[fs_id]]
+    } 
+    cond <- colnames(sp) %in% colnames(fset[[fs_id]])
+    compensate(fset[[fs_id]], sp[cond, cond])
   }
 )
 
