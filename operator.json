@@ -4,7 +4,124 @@
   "tags": ["data preprocessing", "flow cytometry"],
   "authors": ["tercen"],
   "urls": ["https://github.com/tercen/compensate_fcs_operator"],
-  "properties": []
+  "properties": [],
+  "operatorSpec": {
+    "kind": "OperatorSpec",
+    "ontologyUri": "https://tercen.com/_ontology/tercen",
+    "ontologyVersion": "1.0.0",
+    "inputSpecs": [
+      {
+        "kind": "CrosstabSpec",
+        "metaFactors": [
+          {
+            "kind": "MetaFactor",
+            "name": "Channel",
+            "type": "",
+            "description": "Flow cytometry channels",
+            "ontologyMapping": "variable",
+            "crosstabMapping": "row",
+            "cardinality": "1..n",
+            "factors": []
+          },
+          {
+            "kind": "MetaFactor",
+            "name": "Event",
+            "type": "",
+            "description": "Events (Event ID + filename)",
+            "ontologyMapping": "observation",
+            "crosstabMapping": "column",
+            "cardinality": "1..n",
+            "factors": []
+          }
+        ],
+        "axis": [
+          {
+            "kind": "AxisSpec",
+            "metaFactors": [
+              {
+                "kind": "MetaFactor",
+                "name": "Y-Axis",
+                "type": "numeric",
+                "description": "Measurement values",
+                "ontologyMapping": "measurement",
+                "crosstabMapping": "y",
+                "cardinality": "1",
+                "factors": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "CrosstabSpec",
+        "metaFactors": [
+          {
+            "kind": "MetaFactor",
+            "name": "Source Channel",
+            "type": "",
+            "description": "Spillover source channel (comp_1)",
+            "ontologyMapping": "variable",
+            "crosstabMapping": "row",
+            "cardinality": "1..n",
+            "factors": []
+          },
+          {
+            "kind": "MetaFactor",
+            "name": "Target Channel",
+            "type": "",
+            "description": "Spillover target channel (comp_2) + filename",
+            "ontologyMapping": "variable",
+            "crosstabMapping": "column",
+            "cardinality": "1..n",
+            "factors": []
+          }
+        ],
+        "axis": [
+          {
+            "kind": "AxisSpec",
+            "metaFactors": [
+              {
+                "kind": "MetaFactor",
+                "name": "Y-Axis",
+                "type": "numeric",
+                "description": "Compensation matrix value",
+                "ontologyMapping": "measurement",
+                "crosstabMapping": "y",
+                "cardinality": "1",
+                "factors": []
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outputSpecsV2": [
+      {
+        "kind": "OperatorJoinSpec",
+        "joinOperators": [
+          {
+            "kind": "JoinOperator",
+            "joinType": "left",
+            "leftPair": {
+              "kind": "ColumnPair",
+              "lColumns": ["Channel", "Event"],
+              "rColumns": ["Channel", "Event"]
+            },
+            "rightRelation": {
+              "kind": "TableRelation",
+              "attributes": [
+                {
+                  "kind": "Attribute",
+                  "name": "compensated",
+                  "type": "double"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
 }
 
 
