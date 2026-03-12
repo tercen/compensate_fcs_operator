@@ -41,7 +41,7 @@
               {
                 "kind": "MetaFactor",
                 "name": "Y-Axis",
-                "type": "numeric",
+                "type": "double",
                 "description": "Measurement values",
                 "ontologyMapping": "measurement",
                 "crosstabMapping": "y",
@@ -83,7 +83,7 @@
               {
                 "kind": "MetaFactor",
                 "name": "Y-Axis",
-                "type": "numeric",
+                "type": "double",
                 "description": "Compensation matrix value",
                 "ontologyMapping": "measurement",
                 "crosstabMapping": "y",
